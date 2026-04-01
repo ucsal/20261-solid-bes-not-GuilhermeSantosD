@@ -4,6 +4,7 @@ import br.com.ucsal.olimpiadas.repository.ParticipanteRepository;
 import br.com.ucsal.olimpiadas.repository.ProvaRepository;
 import br.com.ucsal.olimpiadas.repository.QuestaoRepository;
 import br.com.ucsal.olimpiadas.repository.TentativaRepository;
+import br.com.ucsal.olimpiadas.service.OlimpiadaService;
 import java.util.Scanner;
 
 public class App {
@@ -12,6 +13,7 @@ public class App {
 	static final ProvaRepository provaRepository = new ProvaRepository();
 	static final QuestaoRepository questaoRepository = new QuestaoRepository();
 	static final TentativaRepository tentativaRepository = new TentativaRepository();
+	static final OlimpiadaService service = new OlimpiadaService(participanteRepository, provaRepository, questaoRepository, tentativaRepository);
 
 	private static final Scanner in = new Scanner(System.in);
 
@@ -55,12 +57,8 @@ public class App {
 			return;
 		}
 
-		var p = new Participante();
-		p.setNome(nome);
-		p.setEmail(email);
-
-		participanteRepository.salvar(p);
-		System.out.println("Participante cadastrado: " + p.getId());
+		service.cadastrarParticipante(nome, email);
+		System.out.println("Participante cadastrado com sucesso.");
 	}
 
 	static void cadastrarProva() {
@@ -72,11 +70,8 @@ public class App {
 			return;
 		}
 
-		var prova = new Prova();
-		prova.setTitulo(titulo);
-
-		provaRepository.salvar(prova);
-		System.out.println("Prova criada: " + prova.getId());
+		service.cadastrarProva(titulo);
+		System.out.println("Prova criada com sucesso.");
 	}
 
 	static void cadastrarQuestao() {
@@ -108,15 +103,9 @@ public class App {
 			return;
 		}
 
-		var q = new Questao();
-		q.setProvaId(provaId);
-		q.setEnunciado(enunciado);
-		q.setAlternativas(alternativas);
-		q.setAlternativaCorreta(correta);
+		service.cadastrarQuestao(provaId, enunciado, alternativas, correta);
 
-		questaoRepository.salvar(q);
-
-		System.out.println("Questão cadastrada: " + q.getId() + " (na prova " + provaId + ")");
+		System.out.println("Questão cadastrada com sucesso (na prova " + provaId + ")");
 	}
 
 
@@ -138,7 +127,7 @@ public class App {
 		if (provaId == null)
 			return;
 
-		var questoesDaProva = questaoRepository.buscarPorProvaId(provaId);
+		var questoesDaProva = service.buscarQuestoesPorProva(provaId);
 
 		if (questoesDaProva.isEmpty()) {
 			System.out.println("esta prova não possui questões cadastradas");
@@ -179,27 +168,19 @@ public class App {
 			tentativa.getRespostas().add(r);
 		}
 
-		tentativaRepository.salvar(tentativa);
+		service.salvarTentativa(tentativa);
 
-		int nota = calcularNota(tentativa);
+		int nota = service.calcularNota(tentativa);
 		System.out.println("\n--- Fim da Prova ---");
 		System.out.println("Nota (acertos): " + nota + " / " + tentativa.getRespostas().size());
 	}
 
-	public static int calcularNota(Tentativa tentativa) {
-		int acertos = 0;
-		for (var r : tentativa.getRespostas()) {
-			if (r.isCorreta())
-				acertos++;
-		}
-		return acertos;
-	}
 
 	static void listarTentativas() {
 		System.out.println("\n--- Tentativas ---");
-		for (var t : tentativaRepository.listarTodas()) {
+		for (var t : service.listarTentativas()) {
 			System.out.printf("#%d | participante=%d | prova=%d | nota=%d/%d%n", t.getId(), t.getParticipanteId(),
-					t.getProvaId(), calcularNota(t), t.getRespostas().size());
+					t.getProvaId(), service.calcularNota(t), t.getRespostas().size());
 		}
 	}
 
@@ -282,26 +263,18 @@ public class App {
 
 
 	static void seed() {
+		service.cadastrarProva("Olimpíada 2026 • Nível 1 • Prova A");
+		var prova = provaRepository.listarTodos().get(0);
 
-		var prova = new Prova();
-		prova.setTitulo("Olimpíada 2026 • Nível 1 • Prova A");
-		provaRepository.salvar(prova);
-
-		var q1 = new Questao();
-		q1.setProvaId(prova.getId());
-
-		q1.setEnunciado("""
-				Questão 1 — Mate em 1.
-				É a vez das brancas.
-				Encontre o lance que dá mate imediatamente.
-				""");
-
+		service.cadastrarQuestao(
+				prova.getId(),
+				"Questão 1 — Mate em 1.\nÉ a vez das brancas.\nEncontre o lance que dá mate imediatamente.\n",
+				new String[] { "A) Qh7#", "B) Qf5#", "C) Qc8#", "D) Qh8#", "E) Qe6#" },
+				'C'
+		);
+		// Note: The previous logic relied on setFenInicial. I should probably add that to the service or keep it if I want to be thorough.
+		// For now, I'll just restore it to be consistent with original behavior.
+		var q1 = questaoRepository.buscarPorProvaId(prova.getId()).get(0);
 		q1.setFenInicial("6k1/5ppp/8/8/8/7Q/6PP/6K1 w - - 0 1");
-
-		q1.setAlternativas(new String[] { "A) Qh7#", "B) Qf5#", "C) Qc8#", "D) Qh8#", "E) Qe6#" });
-
-		q1.setAlternativaCorreta('C');
-
-		questaoRepository.salvar(q1);
 	}
 }
