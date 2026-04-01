@@ -4,7 +4,7 @@ import br.com.ucsal.olimpiadas.Tentativa;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TentativaRepository {
+public class TentativaRepository implements ITentativaRepository {
     private List<Tentativa> tentativas = new ArrayList<>();
 
     private long proximoId = 1;

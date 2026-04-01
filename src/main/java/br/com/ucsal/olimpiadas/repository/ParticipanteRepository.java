@@ -4,7 +4,7 @@ import br.com.ucsal.olimpiadas.Participante;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParticipanteRepository {
+public class ParticipanteRepository implements IParticipanteRepository {
 
     private List<Participante> participantes = new ArrayList<>();
 

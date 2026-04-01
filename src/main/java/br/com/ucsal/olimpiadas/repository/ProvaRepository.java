@@ -4,7 +4,7 @@ import br.com.ucsal.olimpiadas.Prova;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProvaRepository {
+public class ProvaRepository implements IProvaRepository {
 
     private List<Prova> provas = new ArrayList<>();
 

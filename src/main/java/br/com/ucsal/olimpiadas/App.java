@@ -1,19 +1,25 @@
 package br.com.ucsal.olimpiadas;
 
+import br.com.ucsal.olimpiadas.repository.IParticipanteRepository;
+import br.com.ucsal.olimpiadas.repository.IProvaRepository;
+import br.com.ucsal.olimpiadas.repository.IQuestaoRepository;
+import br.com.ucsal.olimpiadas.repository.ITentativaRepository;
 import br.com.ucsal.olimpiadas.repository.ParticipanteRepository;
 import br.com.ucsal.olimpiadas.repository.ProvaRepository;
 import br.com.ucsal.olimpiadas.repository.QuestaoRepository;
 import br.com.ucsal.olimpiadas.repository.TentativaRepository;
+import br.com.ucsal.olimpiadas.service.IOlimpiadaService;
 import br.com.ucsal.olimpiadas.service.OlimpiadaService;
+import br.com.ucsal.olimpiadas.ui.ChessboardPrinter;
 import java.util.Scanner;
 
 public class App {
 
-	static final ParticipanteRepository participanteRepository = new ParticipanteRepository();
-	static final ProvaRepository provaRepository = new ProvaRepository();
-	static final QuestaoRepository questaoRepository = new QuestaoRepository();
-	static final TentativaRepository tentativaRepository = new TentativaRepository();
-	static final OlimpiadaService service = new OlimpiadaService(participanteRepository, provaRepository, questaoRepository, tentativaRepository);
+	static final IParticipanteRepository participanteRepository = new ParticipanteRepository();
+	static final IProvaRepository provaRepository = new ProvaRepository();
+	static final IQuestaoRepository questaoRepository = new QuestaoRepository();
+	static final ITentativaRepository tentativaRepository = new TentativaRepository();
+	static final IOlimpiadaService service = new OlimpiadaService(participanteRepository, provaRepository, questaoRepository, tentativaRepository);
 
 	private static final Scanner in = new Scanner(System.in);
 
@@ -145,7 +151,7 @@ public class App {
 			System.out.println(q.getEnunciado());
 
 			System.out.println("Posição inicial:");
-			imprimirTabuleiroFen(q.getFenInicial());
+			ChessboardPrinter.imprimirTabuleiroFen(q.getFenInicial());
 
 			for (var alt : q.getAlternativas()) {
 			    System.out.println(alt);
@@ -227,39 +233,6 @@ public class App {
 		}
 	}
 
-	static void imprimirTabuleiroFen(String fen) {
-
-		String parteTabuleiro = fen.split(" ")[0];
-		String[] ranks = parteTabuleiro.split("/");
-
-		System.out.println();
-		System.out.println("    a b c d e f g h");
-		System.out.println("   -----------------");
-
-		for (int r = 0; r < 8; r++) {
-
-			String rank = ranks[r];
-			System.out.print((8 - r) + " | ");
-
-			for (char c : rank.toCharArray()) {
-
-				if (Character.isDigit(c)) {
-					int vazios = c - '0';
-					for (int i = 0; i < vazios; i++) {
-						System.out.print(". ");
-					}
-				} else {
-					System.out.print(c + " ");
-				}
-			}
-
-			System.out.println("| " + (8 - r));
-		}
-
-		System.out.println("   -----------------");
-		System.out.println("    a b c d e f g h");
-		System.out.println();
-	}
 
 
 	static void seed() {

@@ -4,23 +4,23 @@ import br.com.ucsal.olimpiadas.Participante;
 import br.com.ucsal.olimpiadas.Prova;
 import br.com.ucsal.olimpiadas.Questao;
 import br.com.ucsal.olimpiadas.Tentativa;
-import br.com.ucsal.olimpiadas.repository.ParticipanteRepository;
-import br.com.ucsal.olimpiadas.repository.ProvaRepository;
-import br.com.ucsal.olimpiadas.repository.QuestaoRepository;
-import br.com.ucsal.olimpiadas.repository.TentativaRepository;
+import br.com.ucsal.olimpiadas.repository.IParticipanteRepository;
+import br.com.ucsal.olimpiadas.repository.IProvaRepository;
+import br.com.ucsal.olimpiadas.repository.IQuestaoRepository;
+import br.com.ucsal.olimpiadas.repository.ITentativaRepository;
 import java.util.List;
 
-public class OlimpiadaService {
+public class OlimpiadaService implements IOlimpiadaService {
 
-    private final ParticipanteRepository participanteRepository;
-    private final ProvaRepository provaRepository;
-    private final QuestaoRepository questaoRepository;
-    private final TentativaRepository tentativaRepository;
+    private final IParticipanteRepository participanteRepository;
+    private final IProvaRepository provaRepository;
+    private final IQuestaoRepository questaoRepository;
+    private final ITentativaRepository tentativaRepository;
 
-    public OlimpiadaService(ParticipanteRepository participanteRepository,
-                            ProvaRepository provaRepository,
-                            QuestaoRepository questaoRepository,
-                            TentativaRepository tentativaRepository) {
+    public OlimpiadaService(IParticipanteRepository participanteRepository,
+                            IProvaRepository provaRepository,
+                            IQuestaoRepository questaoRepository,
+                            ITentativaRepository tentativaRepository) {
         this.participanteRepository = participanteRepository;
         this.provaRepository = provaRepository;
         this.questaoRepository = questaoRepository;
